@@ -1,6 +1,6 @@
 //
 //  ContentView.swift
-//  sandbag
+//  Sandbag
 //
 //  Created by Rickey Johnson on 8/23/25.
 //

@@ -7,19 +7,19 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		660209ED2E5A788C00EE5C00 /* sandbag.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = sandbag.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		66020A042E5A795100EE5C00 /* Sandbag.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sandbag.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		660209EF2E5A788C00EE5C00 /* sandbag */ = {
+		66020A062E5A795100EE5C00 /* Sandbag */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = sandbag;
+			path = Sandbag;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		660209EA2E5A788C00EE5C00 /* Frameworks */ = {
+		66020A012E5A795100EE5C00 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -29,18 +29,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		660209E42E5A788C00EE5C00 = {
+		660209FB2E5A795100EE5C00 = {
 			isa = PBXGroup;
 			children = (
-				660209EF2E5A788C00EE5C00 /* sandbag */,
-				660209EE2E5A788C00EE5C00 /* Products */,
+				66020A062E5A795100EE5C00 /* Sandbag */,
+				66020A052E5A795100EE5C00 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		660209EE2E5A788C00EE5C00 /* Products */ = {
+		66020A052E5A795100EE5C00 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				660209ED2E5A788C00EE5C00 /* sandbag.app */,
+				66020A042E5A795100EE5C00 /* Sandbag.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -48,64 +48,64 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		660209EC2E5A788C00EE5C00 /* sandbag */ = {
+		66020A032E5A795100EE5C00 /* Sandbag */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 660209F82E5A788D00EE5C00 /* Build configuration list for PBXNativeTarget "sandbag" */;
+			buildConfigurationList = 66020A0F2E5A795200EE5C00 /* Build configuration list for PBXNativeTarget "Sandbag" */;
 			buildPhases = (
-				660209E92E5A788C00EE5C00 /* Sources */,
-				660209EA2E5A788C00EE5C00 /* Frameworks */,
-				660209EB2E5A788C00EE5C00 /* Resources */,
+				66020A002E5A795100EE5C00 /* Sources */,
+				66020A012E5A795100EE5C00 /* Frameworks */,
+				66020A022E5A795100EE5C00 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				660209EF2E5A788C00EE5C00 /* sandbag */,
+				66020A062E5A795100EE5C00 /* Sandbag */,
 			);
-			name = sandbag;
+			name = Sandbag;
 			packageProductDependencies = (
 			);
-			productName = sandbag;
-			productReference = 660209ED2E5A788C00EE5C00 /* sandbag.app */;
+			productName = Sandbag;
+			productReference = 66020A042E5A795100EE5C00 /* Sandbag.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		660209E52E5A788C00EE5C00 /* Project object */ = {
+		660209FC2E5A795100EE5C00 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1640;
 				LastUpgradeCheck = 1640;
 				TargetAttributes = {
-					660209EC2E5A788C00EE5C00 = {
+					66020A032E5A795100EE5C00 = {
 						CreatedOnToolsVersion = 16.4;
 					};
 				};
 			};
-			buildConfigurationList = 660209E82E5A788C00EE5C00 /* Build configuration list for PBXProject "sandbag" */;
+			buildConfigurationList = 660209FF2E5A795100EE5C00 /* Build configuration list for PBXProject "Sandbag" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
 			);
-			mainGroup = 660209E42E5A788C00EE5C00;
+			mainGroup = 660209FB2E5A795100EE5C00;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 660209EE2E5A788C00EE5C00 /* Products */;
+			productRefGroup = 66020A052E5A795100EE5C00 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				660209EC2E5A788C00EE5C00 /* sandbag */,
+				66020A032E5A795100EE5C00 /* Sandbag */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		660209EB2E5A788C00EE5C00 /* Resources */ = {
+		66020A022E5A795100EE5C00 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -115,7 +115,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		660209E92E5A788C00EE5C00 /* Sources */ = {
+		66020A002E5A795100EE5C00 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -125,7 +125,7 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		660209F62E5A788D00EE5C00 /* Debug */ = {
+		66020A0D2E5A795200EE5C00 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -188,7 +188,7 @@
 			};
 			name = Debug;
 		};
-		660209F72E5A788D00EE5C00 /* Release */ = {
+		66020A0E2E5A795200EE5C00 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -244,7 +244,7 @@
 			};
 			name = Release;
 		};
-		660209F92E5A788D00EE5C00 /* Debug */ = {
+		66020A102E5A795200EE5C00 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -263,7 +263,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.rickey-johnson.sandbag";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.rickey-johnson.Sandbag";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -271,7 +271,7 @@
 			};
 			name = Debug;
 		};
-		660209FA2E5A788D00EE5C00 /* Release */ = {
+		66020A112E5A795200EE5C00 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -290,7 +290,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.rickey-johnson.sandbag";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.rickey-johnson.Sandbag";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -301,25 +301,25 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		660209E82E5A788C00EE5C00 /* Build configuration list for PBXProject "sandbag" */ = {
+		660209FF2E5A795100EE5C00 /* Build configuration list for PBXProject "Sandbag" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				660209F62E5A788D00EE5C00 /* Debug */,
-				660209F72E5A788D00EE5C00 /* Release */,
+				66020A0D2E5A795200EE5C00 /* Debug */,
+				66020A0E2E5A795200EE5C00 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		660209F82E5A788D00EE5C00 /* Build configuration list for PBXNativeTarget "sandbag" */ = {
+		66020A0F2E5A795200EE5C00 /* Build configuration list for PBXNativeTarget "Sandbag" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				660209F92E5A788D00EE5C00 /* Debug */,
-				660209FA2E5A788D00EE5C00 /* Release */,
+				66020A102E5A795200EE5C00 /* Debug */,
+				66020A112E5A795200EE5C00 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 660209E52E5A788C00EE5C00 /* Project object */;
+	rootObject = 660209FC2E5A795100EE5C00 /* Project object */;
 }
