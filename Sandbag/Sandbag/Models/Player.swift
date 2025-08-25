@@ -13,4 +13,5 @@ struct Player: Identifiable, Codable {
     var bid: Int?
     var booksWon: Int?
     var partnerId: String?
+    var joinedAt: Date
 }
