@@ -10,8 +10,8 @@ import Foundation
 struct Room: Identifiable, Codable {
     let id: String
     var code: String
+    var hostId: String
     var players: [Player]
-    var teams: [Team]
-    var rounds: [Round]
     var isGameActive: Bool
+    var createdAt: Date
 }
