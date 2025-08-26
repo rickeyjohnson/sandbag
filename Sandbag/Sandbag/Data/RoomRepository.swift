@@ -17,10 +17,9 @@ protocol RoomRepository {
     func leaveRoom(roomId: String, playerId: String) async throws
     func setPartner(roomId: String, playerId: String, partnerId: String?) async throws
     
-    // Called once; emits updates as the room changes (realtime)
     func listen(roomId: String, onChange: @escaping (Room) -> Void, onError: @escaping (Error) -> Void) -> RoomListener
-    
-    // Check code uniqueness if your backend supports it
     func isCodeAvailable(_ code: String) async throws -> Bool
     
+    func assignPlayerToTeam(roomId: String, playerId: String, team: TeamAssignment) async throws
+    func startGame(from room: Room, targetScore: Int) async throws -> Game
 }

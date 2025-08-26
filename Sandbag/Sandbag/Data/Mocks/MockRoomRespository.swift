@@ -84,6 +84,40 @@ final class MockRoomRespository: RoomRepository {
         }
     }
     
+    func assignPlayerToTeam(roomId: String, playerId: String, team: TeamAssignment) async throws {
+        guard var room = roomsById[roomId] else { return }
+        room.players = room.players.map { player in
+            var copy = player
+            if player.id == playerId {
+                copy.team = team
+            }
+            return copy
+        }
+        roomsById[roomId] = room
+        broadcast(room)
+    }
+    
+    func startGame(from room: Room, targetScore: Int) async throws -> Game {
+        guard room.players.count == 4 else {
+            throw NSError(domain: "Mock", code: 400, userInfo: [NSLocalizedDescriptionKey: "Need 4 players"])
+        }
+        let teams = [
+            Team(id: "red", playerIds: room.players.filter { $0.team == .red }.map { $0.id }, score: 0, bags: 0),
+            Team(id: "blue", playerIds: room.players.filter { $0.team == .blue }.map { $0.id }, score: 0, bags: 0)
+        ]
+        return Game(
+            id: UUID().uuidString,
+            roomCode: room.code,
+            players: room.players,
+            teams: teams,
+            rounds: [],
+            currentRound: nil,
+            targetScore: targetScore,
+            isActive: true,
+            winnerTeamId: nil
+        )
+    }
+    
     func isCodeAvailable(_ code: String) async throws -> Bool {
         !roomsById.values.contains(where: { $0.code == code })
     }

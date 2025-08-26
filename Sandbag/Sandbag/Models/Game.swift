@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Game: Identifiable, Codable {
+struct Game: Identifiable, Codable, Equatable {
     let id: String
     var roomCode: String
     
@@ -19,4 +19,10 @@ struct Game: Identifiable, Codable {
     var targetScore: Int        // e.g. 500 points
     var isActive: Bool          // true if game is ongoing
     var winnerTeamId: String?   // set when someone reaches targetScore
+    
+    var canStart: Bool {
+        let red = teams.first(where: { $0.id == "red" })?.playerIds.count ?? 0
+        let blue = teams.first(where: { $0.id == "blue" })?.playerIds.count ?? 0
+        return red == 2 && blue == 2
+    }
 }

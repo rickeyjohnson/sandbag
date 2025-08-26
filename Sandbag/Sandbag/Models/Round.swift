@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Round: Identifiable, Codable {
+struct Round: Identifiable, Codable, Equatable {
     let id: String
     var bids: [String: Int] // playerID: bid
     var booksWon: [String: Int] // playerID: books

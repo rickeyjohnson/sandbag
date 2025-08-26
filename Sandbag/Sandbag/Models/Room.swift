@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Room: Identifiable, Codable {
+struct Room: Identifiable, Codable, Equatable {
     let id: String
     var code: String
     var hostId: String

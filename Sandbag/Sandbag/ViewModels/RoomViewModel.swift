@@ -25,6 +25,7 @@ class RoomViewModel: ObservableObject {
     @Published var nameInput: String = ""
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
+    @Published var activeGame: Game?
     
     // MARK: - Dependencies
     private let repository: RoomRepository
@@ -32,6 +33,14 @@ class RoomViewModel: ObservableObject {
     
     private let playerIdKey = "localPlayerId"
     private(set) var localPlayerId: String
+    
+    // MARK: - Local
+    var canStartGame: Bool {
+        let red = players.filter { $0.team == .red }.count
+        let blue = players.filter { $0.team == .blue }.count
+        return red == 2 && blue == 2
+    }
+    let TARGET_SCORE = 500
     
     // MARK: - Init
     init(repository: RoomRepository) {
@@ -60,7 +69,8 @@ class RoomViewModel: ObservableObject {
                 let host = Player(id: localPlayerId,
                                   name: trimmed,
                                   partnerId: nil,
-                                  joinedAt: Date())
+                                  joinedAt: Date(),
+                                  team: .none)
                 
                 let newRoom = try await repository.createRoom(host: host, code: code)
                 attachListener(roomId: newRoom.id)
@@ -77,7 +87,7 @@ class RoomViewModel: ObservableObject {
                 guard !trimmedName.isEmpty else { throw VMError.input("Enter you name") }
                 guard trimmedCode.count == 6 else { throw VMError.input("Enter a 6-character code") }
                 
-                let me = Player (id: localPlayerId, name: trimmedName, partnerId: nil, joinedAt: Date())
+                let me = Player (id: localPlayerId, name: trimmedName, partnerId: nil, joinedAt: Date(), team: .none)
                 
                 // join -> returns up-to-date room
                 let updated = try await repository.joinRoom(code: trimmedCode, player: me)
@@ -104,6 +114,25 @@ class RoomViewModel: ObservableObject {
         Task {
             await runWithSpinner { [self] in
                 try await repository.setPartner(roomId: roomId, playerId: localPlayerId, partnerId: partnerId)
+            }
+        }
+    }
+    
+    func assignTeam(team: TeamAssignment) {
+        guard let roomId = room?.id else { return }
+        Task {
+            await runWithSpinner { [self] in
+                try await repository.assignPlayerToTeam(roomId: roomId, playerId: localPlayerId, team: team)
+            }
+        }
+    }
+    
+    func startGame() {
+        guard let room else { return }
+        Task {
+            await runWithSpinner { [self] in
+                let game = try await repository.startGame(from: room, targetScore: TARGET_SCORE)
+                self.activeGame = game
             }
         }
     }
