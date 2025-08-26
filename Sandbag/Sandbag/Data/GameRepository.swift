@@ -7,17 +7,17 @@
 
 import Foundation
 
-protocol GameRepositoryProtocol {
-    func createGame(roomCode: String, players: [Player], teams: [Team], targetScore: Int) -> Game
-    func fetchGame(by id: String) -> Game?
-    func updateGame(_ game: Game)
-    func deleteGame(by id: String)
-    func assignPlayerToTeam(gameId: String, playerId: String, team: TeamAssignment) async throws
-    func startGame(gameId: String) async throws -> Game
-    
-    func addRound(to gameId: String, round: Round)
-    func endGame(_ gameId: String, winnerTeamId: String)
-}
+//protocol GameRepositoryProtocol {
+//    func createGame(roomCode: String, players: [Player], teams: [Team], targetScore: Int) -> Game
+//    func fetchGame(by id: String) -> Game?
+//    func updateGame(_ game: Game)
+//    func deleteGame(by id: String)
+//    func assignPlayerToTeam(gameId: String, playerId: String, team: TeamAssignment) async throws
+//    func startGame(gameId: String) async throws -> Game
+//    
+//    func addRound(to gameId: String, round: Round)
+//    func endGame(_ gameId: String, winnerTeamId: String)
+//}
 
 final class GameRepository: GameRepositoryProtocol {
     private var games: [String: Game] = [:]

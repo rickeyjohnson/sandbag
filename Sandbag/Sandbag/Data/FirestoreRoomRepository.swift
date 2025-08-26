@@ -8,6 +8,23 @@
 import Foundation
 import FirebaseFirestore
 
+protocol RoomListener {
+    func cancel()
+}
+
+protocol RoomRepository {
+    func createRoom(host: Player, code: String) async throws -> Room
+    func joinRoom(code: String, player: Player) async throws -> Room
+    func leaveRoom(roomId: String, playerId: String) async throws
+    func setPartner(roomId: String, playerId: String, partnerId: String?) async throws
+    
+    func listen(roomId: String, onChange: @escaping (Room) -> Void, onError: @escaping (Error) -> Void) -> RoomListener
+    func isCodeAvailable(_ code: String) async throws -> Bool
+    
+    func assignPlayerToTeam(roomId: String, playerId: String, team: TeamAssignment) async throws
+    func startGame(from room: Room, targetScore: Int) async throws -> Game
+}
+
 final class FirestoreRoomRepository: RoomRepository {
     private let db = Firestore.firestore()
     
@@ -61,4 +78,39 @@ final class FirestoreRoomRepository: RoomRepository {
         
         try ref.setData(from: room)
     }
+    
+    func listen(roomId: String, onChange: @escaping (Room) -> Void, onError: @escaping (any Error) -> Void) -> any RoomListener {
+        let listener = db.collection("rooms").document(roomId)
+            .addSnapshotListener { snapshot, error in
+                if let error = error { onError(error); return }
+                guard let snapshot, let room = try? snapshot.data(as: Room.self) else { return }
+                onChange(room)
+            }
+        return FirestoreListenerHandle(listener: listener)
+    }
+    
+    func isCodeAvailable(_ code: String) async throws -> Bool {
+        let docs = try await db.collection("rooms").whereField("code", isEqualTo: code).getDocuments()
+        return docs.isEmpty
+    }
+    
+    func assignPlayerToTeam(roomId: String, playerId: String, team: TeamAssignment) async throws {
+        let ref = db.collection("rooms").document(roomId)
+        var room = try await ref.getDocument(as: Room.self)
+        room.players = room.players.map { player in
+            var copy = player
+            if player.id == playerId {
+                copy.team = team
+            }
+            return copy
+        }
+        
+        try ref.setData(from: room)
+    }
+}
+
+final class FirestoreListenerHandle: RoomListener {
+    private let handle: ListenerRegistration
+    init(listener: ListenerRegistration) { self.handle = listener }
+    func cancel() { handle.remove() }
 }
