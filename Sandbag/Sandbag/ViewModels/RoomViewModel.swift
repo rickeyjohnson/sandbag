@@ -17,6 +17,7 @@ class RoomViewModel: ObservableObject {
     // Keep a live subscription to room changes (realtime updates)
     // Handle leaving room / cleaning up listeners
     // Surface loading & errors for the UI
+    let TARGET_SCORE = 500
     
     // MARK: - Published UI State
     @Published var room: Room?
@@ -25,7 +26,6 @@ class RoomViewModel: ObservableObject {
     @Published var nameInput: String = ""
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
-    @Published var activeGame: Game?
     
     // MARK: - Dependencies
     private let repository: RoomRepository
@@ -33,14 +33,6 @@ class RoomViewModel: ObservableObject {
     
     private let playerIdKey = "localPlayerId"
     private(set) var localPlayerId: String
-    
-    // MARK: - Local
-    var canStartGame: Bool {
-        let red = players.filter { $0.team == .red }.count
-        let blue = players.filter { $0.team == .blue }.count
-        return red == 2 && blue == 2
-    }
-    let TARGET_SCORE = 500
     
     // MARK: - Init
     init(repository: RoomRepository) {
@@ -127,13 +119,13 @@ class RoomViewModel: ObservableObject {
         }
     }
     
-    func startGame() {
-        guard let room else { return }
-        Task {
-            await runWithSpinner { [self] in
-                let game = try await repository.startGame(from: room, targetScore: TARGET_SCORE)
-                self.activeGame = game
-            }
+    func startGame(targetScore: Int) async -> Game? {
+        guard let room else { return nil }
+        do {
+            return try await repository.startGame(from: room, targetScore: targetScore)
+        } catch {
+            self.errorMessage = error.localizedDescription
+            return nil
         }
     }
     
