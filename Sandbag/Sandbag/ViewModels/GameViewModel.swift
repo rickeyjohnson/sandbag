@@ -20,82 +20,106 @@ class GameViewModel: ObservableObject {
         self.repository = repository
     }
     
-    func attachListener(gameId: String) {
-        detachListener()
-        listener = repository.listen(gameId: gameId, onChange: { [weak self] game in
-            self?.game = game
-        }, onError: { [weak self] error in
-            self?.errorMessage = error.localizedDescription
-        })
+    // MARK: - Round Phases
+    
+    var currentPhase: RoundPhase? { game?.currentRound?.phase }
+    
+    var isBidding: Bool { currentPhase == .bidding }
+    var isTeamConfirmation: Bool { currentPhase == .teamConfirmation }
+    var isPlaying: Bool { currentPhase == .playing }
+    var isScoring: Bool { currentPhase == .scoring }
+    var isRoundFinished: Bool { currentPhase == .scored }
+    
+    // MARK: - Listeners
+    
+    func listen(to gameId: String) {
+        listener?.cancel()
+        listener = repository.listen(
+            gameId: gameId,
+            onChange: { [weak self] updatedGame in
+                Task { @MainActor in
+                    self?.game = updatedGame
+                }
+            },
+            onError: { [weak self] error in
+                Task { @MainActor in
+                    self?.errorMessage = error.localizedDescription
+                }
+            })
     }
     
-    func detachListener() {
+    func stopListening() {
         listener?.cancel()
         listener = nil
     }
     
-    func submitBid(playerId: String, bid: Int) {
-        guard var currentGame = game else { return }
-        
-        if let idx = currentGame.players.firstIndex(where: { $0.id == playerId }) {
-            currentGame.players[idx].bid = bid
-        }
-        
-        Task {
-            await runWithSpinner {
-                try await repository.updateGame(currentGame)
-            }
-        }
-    }
+    // MARK: - Game Flow
     
-    func completeRound(booksWon: [String: Int]) {
-        guard var currentGame = game else { return }
-        
-        for (playerId, books) in booksWon {
-            if let idx = currentGame.players.firstIndex(where: { $0.id == playerId}) {
-                currentGame.players[idx].booksWon = books
-            }
-        }
-        
-        let bidsDict: [String: Int] = currentGame.players.reduce(into: [:]) { result, player in
-            result[player.id] = player.bid ?? 0
-        }
-        
-        let roundScore: [String: Int] = [:]
-        
-        let round = Round(
-            id: UUID().uuidString,
-            bids: bidsDict,
-            booksWon: booksWon,
-            roundScore: roundScore,
-            teamBids: [:],
-            createdAt: Date()
-        )
-        
-        Task {
-            await runWithSpinner {
-                try await repository.addRound(to: currentGame.id, round: round)
-            }
-        }
-    }
-    
-    func endGame(winnerTeamId: String) {
+    func startGame() async {
         guard let gameId = game?.id else { return }
-        Task {
-            await runWithSpinner {
-                try await repository.endGame(gameId, winnerTeamId: winnerTeamId)
-            }
+        isLoading = true
+        do {
+            let updated = try await repository.startGame(gameId: gameId)
+            self.game = updated
+        } catch {
+            errorMessage = "Failed to start game: \(error.localizedDescription)"
+        }
+        isLoading = false
+    }
+    
+    func endGame(winnerTeamId: String) async {
+        guard let gameId = game?.id else { return }
+        do {
+            try await repository.endGame(gameId, winnerTeamId: winnerTeamId)
+        } catch {
+            errorMessage = "Failed to end game: \(error.localizedDescription)"
         }
     }
     
-    private func runWithSpinner(_ work: () async throws -> Void) async {
-        isLoading = true
-        defer { isLoading = false }
+    // MARK: - Round Flow
+    func submitBid(playerId: String, bid: Int) async {
+        guard let gameId = game?.id else { return }
         do {
-            try await work()
-            errorMessage = nil
+            try await repository.submitBid(gameId: gameId, playerId: playerId, bid: bid)
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = "Failed to submit bid: \(error.localizedDescription)"
+        }
+    }
+    
+    func confirmTeamBid(teamId: String, bid: Int, comfirmedBy: String) async {
+        guard let gameId = game?.id else { return }
+        do {
+            try await repository.confirmTeamBid(gameId: gameId, teamId: teamId, bid: bid, confirmedBy: comfirmedBy)
+        } catch {
+            errorMessage = "Failed to confirm team bid: \(error.localizedDescription)"
+        }
+    }
+    
+    func submitBooks(playerId: String, books: Int) async {
+        guard let gameId = game?.id else { return }
+        do {
+            try await repository.submitBooks(gameId: gameId, playerId: playerId, books: books)
+        } catch {
+            errorMessage = "Failed to submit books: \(error.localizedDescription)"
+        }
+    }
+    
+    func scoreRound(round: Round) async {
+        guard let gameId = game?.id else { return }
+        do {
+            let updated = try await repository.scoreRound(gameId: gameId, round: round)
+            self.game = updated
+        } catch {
+            errorMessage = "Failed to score round: \(error.localizedDescription)"
+        }
+    }
+    
+    func assignPlayerToTeam(playerId: String, teamId: TeamAssignment) async {
+        guard let gameId = game?.id else { return }
+        do {
+            try await repository.assignPlayerToTeam(gameId: gameId, playerId: playerId, team: teamId)
+        } catch {
+            errorMessage = "Failed to assign player to team: \(error.localizedDescription)"
         }
     }
 }

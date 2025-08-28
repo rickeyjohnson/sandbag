@@ -11,9 +11,8 @@ enum RoundPhase: String, Codable {
     case bidding
     case teamConfirmation
     case playing
-    case booksSubmission
+    case scoring
     case scored
-    case finished
 }
 
 struct Round: Identifiable, Codable, Equatable {

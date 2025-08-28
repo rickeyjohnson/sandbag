@@ -9,10 +9,12 @@ import SwiftUI
 
 struct RoomLobbyView: View {
     @ObservedObject var viewModel: RoomViewModel
+    let localPlayerId: String
     @State private var goToGame: Bool = false
+    @State private var activeGame: Game?
     
     private var isHost: Bool {
-        viewModel.room?.hostId == viewModel.localPlayerId
+        viewModel.room?.hostId == localPlayerId
     }
     
     var body: some View {
@@ -20,54 +22,66 @@ struct RoomLobbyView: View {
             if let room = viewModel.room {
                 Text("Room Code: \(room.code)").font(.title3.bold())
                 
-                List(viewModel.players) { player in
+                List(room.players) { player in
                     HStack {
                         Text(player.name)
                         Spacer()
-                        Text(player.team.rawValue.capitalized)
-                            .foregroundColor(player.team == .red ? .red : (player.team == .blue ? .blue: .gray))
-                        if player.id == viewModel.localPlayerId {
+                        Text(player.team?.rawValue.capitalized ?? "Unassigned")
+                            .foregroundColor(player.team == .red ? .red : (player.team == .blue ? .blue : .gray))
+                        if player.id == localPlayerId {
                             Text("You").foregroundStyle(.secondary).padding(.leading, 6)
                         }
                     }
                 }
                 
                 HStack {
-                    Button("Join Red") { viewModel.assignTeam(team: .red) }
-                        .buttonStyle(.bordered)
+                    Button("Join Red") {
+                        Task { await viewModel.assignPlayerToTeam(playerId: localPlayerId, team: .red) }
+                    }
+                    .buttonStyle(.bordered)
                     
-                    Button("Join Blue") { viewModel.assignTeam(team: .blue) }
-                        .buttonStyle(.bordered)
+                    Button("Join Blue") {
+                        Task { await viewModel.assignPlayerToTeam(playerId: localPlayerId, team: .blue) }
+                    }
+                    .buttonStyle(.bordered)
                 }
                 
                 if isHost {
                     Button("Start Game") {
-                        viewModel.startGame()
+                        Task {
+                            if let game = await viewModel.startGame(targetScore: 500) {
+                                activeGame = game
+                                goToGame = true
+                            }
+                        }
                     }
                     .buttonStyle(.borderedProminent)
                     .disabled(!viewModel.canStartGame)
                 }
                 
                 Button("Leave Room", role: .destructive) {
-                    viewModel.leaveRoom()
+                    Task { await viewModel.leaveRoom(playerId: localPlayerId) }
                 }
                 .padding(.top, 8)
                 
-                // Navigate when game is created
                 NavigationLink("", isActive: $goToGame) {
-                    if let game = viewModel.activeGame {
-                        GameView(viewModel: GameViewModel(game: game))
+                    if let game = activeGame {
+                        let gameRepo = FirestoreGameRepository()
+                        let gvm = GameViewModel(repository: gameRepo)
+                        GameView(vm: gvm, playerId: localPlayerId )
+                            .onAppear {
+                                gvm.listen(to: game.id)
+                            }
+                    } else {
+                        Text("Loading game...")
                     }
                 }
                 .hidden()
             } else {
-                Text("Room ended or unavaialable").foregroundStyle(.secondary)
+                Text("Room ended or unavailable").foregroundStyle(.secondary)
             }
         }
         .padding()
         .navigationTitle("Room Lobby")
-        .onChange(of: viewModel.activeGame) { _, newValue in
-                goToGame = (newValue != nil)
-        }
     }
 }

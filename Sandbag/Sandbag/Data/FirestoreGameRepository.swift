@@ -156,12 +156,21 @@ final class FirestoreGameRepository: GameRepository {
         round.booksWon[playerId] = books
         
         if round.booksWon.count == game.players.count {
-            round.phase = .scored
-            game = try await scoreRound(gameId: gameId, round: round)
-        } else {
-            game.currentRound = round
-            try ref.setData(from: game, merge: true)
+            round.phase = .scoring
+            let scoredGame = try await scoreRound(gameId: gameId, round: round)
+            var finishedRound = scoredGame.rounds.last!
+            finishedRound.phase = .scored
+            
+            var updatedGame = scoredGame
+            updatedGame.rounds[updatedGame.rounds.count - 1] = finishedRound
+            updatedGame.currentRound = nil
+            
+            try ref.setData(from: updatedGame, merge: true)
+            return
         }
+        
+        game.currentRound = round
+        try ref.setData(from: game, merge: true)
     }
     
     func scoreRound(gameId: String, round: Round) async throws -> Game {
@@ -220,6 +229,7 @@ final class FirestoreGameRepository: GameRepository {
         }
         
         updatedRound.roundScore = roundScores
+        updatedRound.phase = .scored
         return (updatedRound, updatedGame)
     }
     

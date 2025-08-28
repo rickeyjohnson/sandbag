@@ -28,6 +28,22 @@ class RoomViewModel: ObservableObject {
     private let repository: RoomRepository
     private var listener: RoomListener?
     
+    var canStartGame: Bool {
+        guard let room = room else { return false }
+        
+        // Require exactly 4 players
+        guard room.players.count == 4 else { return false }
+        
+        // Require that all players have a team assignment
+        let allAssigned = room.players.allSatisfy { $0.team != nil }
+        
+        // Require that both teams have exactly 2 players
+        let redCount = room.players.filter { $0.team == .red }.count
+        let blueCount = room.players.filter { $0.team == .blue }.count
+        
+        return allAssigned && redCount == 2 && blueCount == 2
+    }
+    
     
     // MARK: - Init
     init(repository: RoomRepository) {

@@ -8,25 +8,35 @@
 import SwiftUI
 
 struct GameView: View {
-    @StateObject var viewModel: GameViewModel
+    @StateObject var vm: GameViewModel
+    let playerId: String
     
     var body: some View {
-        VStack(spacing: 12) {
-            Text("Target: \(viewModel.game.targetScore)")
-                .font(.title3.bold())
-            
-            ForEach(viewModel.game.teams) { team in
-                VStack(alignment: .leading) {
-                    Text("\(team.id.capitalized) Team")
-                        .font(.headline)
-                    Text("Players: \(team.playerIds.count)")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
+        VStack {
+            if vm.isBidding {
+                BiddingView(vm: vm, playerId: playerId)
+            } else if vm.isTeamConfirmation {
+                TeamConfirmationView(vm: vm, playerId: playerId)
+            } else if vm.isPlaying {
+                PlayingView(vm: vm)
+            } else if vm.isScoring {
+                ScoringView(vm: vm, playerId: playerId)
+            } else if vm.isRoundFinished {
+                RoundSummaryView(vm: vm)
+            } else {
+                Text("Waiting for game to start…")
             }
-            
-            Divider().padding(.vertical, 8)
+        }
+        .alert(item: Binding(
+            get: { vm.errorMessage.map { ErrorWrapper(message: $0) } },
+            set: { _ in vm.errorMessage = nil })
+        ) { wrapper in
+            Alert(title: Text("Error"), message: Text(wrapper.message), dismissButton: .default(Text("OK")))
         }
     }
+}
+
+struct ErrorWrapper: Identifiable {
+    var id: String = UUID().uuidString
+    var message: String
 }
