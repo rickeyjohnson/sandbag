@@ -68,6 +68,7 @@ class GameViewModel: ObservableObject {
             bids: bidsDict,
             booksWon: booksWon,
             roundScore: roundScore,
+            teamBids: [:],
             createdAt: Date()
         )
         

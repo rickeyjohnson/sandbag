@@ -136,8 +136,8 @@ final class FirestoreRoomRepository: RoomRepository {
 
         // Create teams
         let teams = [
-            Team(id: "red", playerIds: red.map { $0.id }, score: 0, bags: 0),
-            Team(id: "blue", playerIds: blue.map { $0.id }, score: 0, bags: 0)
+            Team(id: "red", assignment: .red, score: 0, bags: 0),
+            Team(id: "blue", assignment: .blue, score: 0, bags: 0)
         ]
 
         // Create game

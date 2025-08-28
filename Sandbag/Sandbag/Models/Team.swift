@@ -9,7 +9,7 @@ import Foundation
 
 struct Team: Identifiable, Codable, Equatable {
     let id: String
-    var playerIds: [String]
+    var assignment: TeamAssignment
     var score: Int
     var bags: Int
 }

@@ -20,5 +20,5 @@ struct Player: Identifiable, Codable, Equatable {
     var booksWon: Int?
     var partnerId: String?
     var joinedAt: Date
-    var team: TeamAssignment
+    var team: TeamAssignment?
 }

@@ -20,9 +20,32 @@ struct Game: Identifiable, Codable, Equatable {
     var isActive: Bool          // true if game is ongoing
     var winnerTeamId: String?   // set when someone reaches targetScore
     
-    var canStart: Bool {
-        let red = teams.first(where: { $0.id == "red" })?.playerIds.count ?? 0
-        let blue = teams.first(where: { $0.id == "blue" })?.playerIds.count ?? 0
-        return red == 2 && blue == 2
+    var teamTotals: [String: Int] // teamID: total score
+    var playerTotals: [String: Int] // playerID: total score
+    
+    init(
+        id: String = UUID().uuidString,
+        roomCode: String,
+        players: [Player],
+        teams: [Team],
+        rounds: [Round] = [],
+        currentRound: Round? = nil,
+        targetScore: Int,
+        isActive: Bool = false,
+        winnerTeamId: String? = nil,
+        teamTotals: [String: Int] = ["red": 0, "blue": 0],
+        playerTotals: [String: Int] = [:]
+    ) {
+        self.id = id
+        self.roomCode = roomCode
+        self.players = players
+        self.teams = teams
+        self.rounds = rounds
+        self.currentRound = currentRound
+        self.targetScore = targetScore
+        self.isActive = isActive
+        self.winnerTeamId = winnerTeamId
+        self.teamTotals = teamTotals
+        self.playerTotals = playerTotals
     }
 }
