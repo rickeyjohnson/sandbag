@@ -28,11 +28,13 @@ class RoomViewModel: ObservableObject {
     private let repository: RoomRepository
     private var listener: RoomListener?
     
+    @Published private(set) var localPlayerId: String?
+    
     var canStartGame: Bool {
         guard let room = room else { return false }
         
         // Require exactly 4 players
-        guard room.players.count == 4 else { return false }
+        guard room.players.count >= 2 else { return false } // was 4 REVERT when deploying
         
         // Require that all players have a team assignment
         let allAssigned = room.players.allSatisfy { $0.team != nil }
@@ -41,7 +43,7 @@ class RoomViewModel: ObservableObject {
         let redCount = room.players.filter { $0.team == .red }.count
         let blueCount = room.players.filter { $0.team == .blue }.count
         
-        return allAssigned && redCount == 2 && blueCount == 2
+        return allAssigned && (redCount == blueCount)
     }
     
     
@@ -55,9 +57,10 @@ class RoomViewModel: ObservableObject {
     func createRoom(playerName: String) async {
         isLoading = true
         do {
-            let players = Player(id: UUID().uuidString, name: playerName, joinedAt: Date())
+            let player = Player(id: UUID().uuidString, name: playerName, joinedAt: Date())
+            self.localPlayerId = player.id
             let code = try await generateUniqueCode()
-            let room = try await repository.createRoom(host: players, code: code)
+            let room = try await repository.createRoom(host: player, code: code)
             self.room = room
             listen(for: room.id)
         } catch {
@@ -72,6 +75,7 @@ class RoomViewModel: ObservableObject {
             let player = Player(id: UUID().uuidString,
                                 name: playerName,
                                 joinedAt: Date())
+            self.localPlayerId = player.id
             let room = try await repository.joinRoom(code: code, player: player)
             self.room = room
             listen(for: room.id)
@@ -98,6 +102,14 @@ class RoomViewModel: ObservableObject {
             try await repository.assignPlayerToTeam(roomId: roomId, playerId: playerId, team: team)
         } catch {
             errorMessage = "Failed to assign team: \(error.localizedDescription)"
+        }
+    }
+    
+    func autoAssignTeams() async {
+        guard let room = room else { return }
+        for (index, player) in room.players.enumerated() {
+            let team: TeamAssignment = (index % 2 == 0) ? .red : .blue
+            await assignPlayerToTeam(playerId: player.id, team: team)
         }
     }
     

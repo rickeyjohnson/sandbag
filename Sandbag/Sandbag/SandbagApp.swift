@@ -7,11 +7,12 @@
 
 import SwiftUI
 import Firebase
+import FirebaseCore
+import FirebaseFirestore
 
 @main
 struct SandbagApp: App {
-    
-    init () {
+    init() {
         FirebaseApp.configure()
     }
     

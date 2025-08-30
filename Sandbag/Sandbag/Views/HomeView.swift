@@ -12,7 +12,6 @@ struct HomeView: View {
     @State private var joinCode: String = ""
     @State private var playerName: String = ""
     @State private var goToLobby = false
-    @State private var localPlayerId: String = ""
     
     init() {
         let repo = FirestoreRoomRepository()
@@ -59,7 +58,7 @@ struct HomeView: View {
                 }
                 
                 NavigationLink("", isActive: $goToLobby) {
-                    RoomLobbyView(viewModel: viewModel, localPlayerId: localPlayerId)
+                    RoomLobbyView(viewModel: viewModel, localPlayerId: viewModel.localPlayerId ?? "")
                 }
                 .hidden()
             }
