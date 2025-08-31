@@ -14,7 +14,9 @@ struct Game: Identifiable, Codable, Equatable {
     var players: [Player]       // all 4 players
     var teams: [Team]           // 2 teams
     var rounds: [Round]         // completed rounds
-    var currentRound: Round?    // round in progress
+    var currentRound: Round? {
+        rounds.last
+    }    // round in progress
     
     var targetScore: Int        // e.g. 500 points
     var isActive: Bool          // true if game is ongoing
@@ -29,7 +31,6 @@ struct Game: Identifiable, Codable, Equatable {
         players: [Player],
         teams: [Team],
         rounds: [Round] = [],
-        currentRound: Round? = nil,
         targetScore: Int,
         isActive: Bool = false,
         winnerTeamId: String? = nil,
@@ -41,7 +42,6 @@ struct Game: Identifiable, Codable, Equatable {
         self.players = players
         self.teams = teams
         self.rounds = rounds
-        self.currentRound = currentRound
         self.targetScore = targetScore
         self.isActive = isActive
         self.winnerTeamId = winnerTeamId

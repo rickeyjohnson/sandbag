@@ -70,6 +70,7 @@ struct RoomLobbyView: View {
                         let gvm = GameViewModel(repository: gameRepo)
                         GameView(vm: gvm, playerId: localPlayerId )
                             .onAppear {
+                                gvm.game = game
                                 gvm.listen(to: game.id)
                             }
                     } else {
@@ -83,5 +84,11 @@ struct RoomLobbyView: View {
         }
         .padding()
         .navigationTitle("Room Lobby")
+        .onChange(of: viewModel.activeGame) { _, newGame in
+                    if let newGame {
+                        activeGame = newGame
+                        goToGame = true
+                    }
+                }
     }
 }

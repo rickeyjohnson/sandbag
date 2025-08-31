@@ -23,6 +23,7 @@ class RoomViewModel: ObservableObject {
     @Published var room: Room?
     @Published var errorMessage: String?
     @Published var isLoading = false
+    @Published var activeGame: Game?
     
     // MARK: - Dependencies
     private let repository: RoomRepository
@@ -117,6 +118,7 @@ class RoomViewModel: ObservableObject {
         guard let room = room else { return nil }
         do {
             let game = try await repository.startGame(from: room, targetScore: targetScore)
+            self.activeGame = game
             return game
         } catch {
             errorMessage = "Failed to start game: \(error.localizedDescription)"
@@ -132,6 +134,21 @@ class RoomViewModel: ObservableObject {
             onChange: { [weak self] updatedRoom in
                 Task { @MainActor in
                     self?.room = updatedRoom
+                    
+                    if let game = updatedRoom.activeGame {
+                        self?.activeGame = game
+                    } else if let gameId = updatedRoom.currentGameId {
+                        // Optionally fetch from GameRepository
+                        let gameRepo = FirestoreGameRepository()
+                        do {
+                            let fetched = try await gameRepo.fetchGame(by: gameId)
+                            self?.activeGame = fetched
+                        } catch {
+                            self?.errorMessage = "Failed to fetch game: \(error.localizedDescription)"
+                        }
+                    } else {
+                        self?.activeGame = nil
+                    }
                 }
             },
             onError: { [weak self] error in

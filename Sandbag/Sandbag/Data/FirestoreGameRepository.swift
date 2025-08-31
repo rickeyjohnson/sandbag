@@ -86,7 +86,6 @@ final class FirestoreGameRepository: GameRepository {
         var game = try await ref.getDocument(as: Game.self)
 
         game.rounds.append(round)
-        game.currentRound = nil
 
         try ref.setData(from: game, merge: true)
     }
@@ -94,15 +93,26 @@ final class FirestoreGameRepository: GameRepository {
     func startGame(gameId: String) async throws -> Game {
         let ref = db.collection("games").document(gameId)
         var game = try await ref.getDocument(as: Game.self)
+        
+        let newRound = Round(
+                    id: UUID().uuidString,
+                    bids: [:],
+                    teamBids: [:],
+                    booksWon: [:],
+                    roundScore: [:],
+                    createdAt: Date(),
+                    phase: .bidding
+                )
 
         let redCount = game.players.filter { $0.team == .red }.count
         let blueCount = game.players.filter { $0.team == .blue }.count
 
-        guard redCount == 2 && blueCount == 2 else {
+        guard redCount == blueCount else {
             throw NSError(domain: "Teams not ready", code: 400)
         }
 
         game.isActive = true
+        game.rounds = [newRound]
         try ref.setData(from: game, merge: true)
 
         return game
@@ -129,7 +139,6 @@ final class FirestoreGameRepository: GameRepository {
             round.phase = .teamConfirmation
         }
         
-        game.currentRound = round
         try ref.setData(from: game, merge: true)
     }
     
@@ -144,7 +153,6 @@ final class FirestoreGameRepository: GameRepository {
             round.phase = .playing
         }
         
-        game.currentRound = round
         try ref.setData(from: game, merge: true)
     }
     
@@ -163,13 +171,11 @@ final class FirestoreGameRepository: GameRepository {
             
             var updatedGame = scoredGame
             updatedGame.rounds[updatedGame.rounds.count - 1] = finishedRound
-            updatedGame.currentRound = nil
             
             try ref.setData(from: updatedGame, merge: true)
             return
         }
         
-        game.currentRound = round
         try ref.setData(from: game, merge: true)
     }
     
@@ -181,7 +187,6 @@ final class FirestoreGameRepository: GameRepository {
         
         var gameCopy = updateGame
         gameCopy.rounds.append(updatedRound)
-        gameCopy.currentRound = nil
         
         try ref.setData(from: gameCopy, merge: true)
         return gameCopy

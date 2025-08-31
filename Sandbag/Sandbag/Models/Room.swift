@@ -15,4 +15,5 @@ struct Room: Identifiable, Codable, Equatable {
     var isGameActive: Bool
     var createdAt: Date
     var currentGameId: String?
+    var activeGame: Game?
 }

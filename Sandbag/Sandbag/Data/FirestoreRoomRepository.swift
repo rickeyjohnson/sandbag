@@ -130,7 +130,7 @@ final class FirestoreRoomRepository: RoomRepository {
         // Validate teams
         let red = room.players.filter { $0.team == .red }
         let blue = room.players.filter { $0.team == .blue }
-        guard red.count == 2, blue.count == 2 else {
+        guard red.count == blue.count else {
             throw NSError(domain: "Teams not ready", code: 400)
         }
 
@@ -139,6 +139,17 @@ final class FirestoreRoomRepository: RoomRepository {
             Team(id: "red", assignment: .red, score: 0, bags: 0),
             Team(id: "blue", assignment: .blue, score: 0, bags: 0)
         ]
+        
+        // Create round
+        let firstRound = Round(
+            id: UUID().uuidString,
+            bids: [:],
+            teamBids: [:],
+            booksWon: [:],
+            roundScore: [:],
+            createdAt: Date(),
+            phase: .bidding
+        )
 
         // Create game
         let game = Game(
@@ -146,8 +157,7 @@ final class FirestoreRoomRepository: RoomRepository {
             roomCode: room.code,
             players: room.players,
             teams: teams,
-            rounds: [],
-            currentRound: nil,
+            rounds: [firstRound],
             targetScore: targetScore,
             isActive: true,
             winnerTeamId: nil
@@ -160,6 +170,8 @@ final class FirestoreRoomRepository: RoomRepository {
         var updatedRoom = room
         updatedRoom.isGameActive = true
         updatedRoom.currentGameId = game.id
+        updatedRoom.activeGame = game
+        
         try db.collection("rooms").document(room.id).setData(from: updatedRoom)
 
         return game
