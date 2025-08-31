@@ -9,15 +9,21 @@ import SwiftUI
 
 struct PlayingView: View {
     @ObservedObject var vm: GameViewModel
+    let playerId: String
     
     var body: some View {
         VStack {
             Text("Game in progress…")
                 .font(.headline)
             
+            // TODO: - Add isHost attribute to button
             Button("Finish Round") {
-                // round moves to books entry after button
-                // (handled in repo when all books are submitted)
+                Task { await vm.finishRound() }
+            }
+            .padding(.top, 12)
+            
+            Button("Quit Game", role: .destructive) {
+                Task { await vm.forfeitGame(playerId: playerId) }
             }
             .padding(.top, 12)
         }

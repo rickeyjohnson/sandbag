@@ -17,7 +17,7 @@ class RoomViewModel: ObservableObject {
     // Keep a live subscription to room changes (realtime updates)
     // Handle leaving room / cleaning up listeners
     // Surface loading & errors for the UI
-    let TARGET_SCORE = 500
+    let TARGET_SCORE = 200
     
     // MARK: - Published UI State
     @Published var room: Room?

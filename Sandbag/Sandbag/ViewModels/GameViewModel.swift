@@ -114,6 +114,33 @@ class GameViewModel: ObservableObject {
         }
     }
     
+    func finishRound() async {
+        guard let gameId = game?.id else { return }
+        do {
+            try await repository.finishRound(gameId: gameId)
+        } catch {
+            errorMessage = "Failed to finish round: \(error.localizedDescription)"
+        }
+    }
+    
+    func startNextRound() async {
+        guard let gameId = game?.id else { return }
+        do {
+            try await repository.startNextRound(gameId: gameId)
+        } catch {
+            errorMessage = "Failed to start next round: \(error.localizedDescription)"
+        }
+    }
+    
+    func forfeitGame(playerId: String) async {
+        guard let gameId = game?.id else { return }
+        do {
+            try await repository.forfeitGame(gameId: gameId, quittingPlayerId: playerId)
+        } catch {
+            errorMessage = "Failed to forfeit: \(error.localizedDescription)"
+        }
+    }
+    
     func assignPlayerToTeam(playerId: String, teamId: TeamAssignment) async {
         guard let gameId = game?.id else { return }
         do {

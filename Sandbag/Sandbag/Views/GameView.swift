@@ -13,18 +13,24 @@ struct GameView: View {
     
     var body: some View {
         VStack {
-            if vm.isBidding {
-                BiddingView(vm: vm, playerId: playerId)
-            } else if vm.isTeamConfirmation {
-                TeamConfirmationView(vm: vm, playerId: playerId)
-            } else if vm.isPlaying {
-                PlayingView(vm: vm)
-            } else if vm.isScoring {
-                ScoringView(vm: vm, playerId: playerId)
-            } else if vm.isRoundFinished {
-                RoundSummaryView(vm: vm)
+            if let game = vm.game {
+                if !game.isActive {
+                    WinnerView(game: game)
+                } else if vm.isBidding {
+                    BiddingView(vm: vm, playerId: playerId)
+                } else if vm.isTeamConfirmation {
+                    TeamConfirmationView(vm: vm, playerId: playerId)
+                } else if vm.isPlaying {
+                    PlayingView(vm: vm, playerId: playerId)
+                } else if vm.isScoring {
+                    ScoringView(vm: vm, playerId: playerId)
+                } else if vm.isRoundFinished {
+                    RoundSummaryView(vm: vm, playerId: playerId)
+                } else {
+                    Text("Waiting for game to start…")
+                }
             } else {
-                Text("Waiting for game to start…")
+                ProgressView("Loading game...")
             }
         }
         .alert(item: Binding(

@@ -13,6 +13,8 @@ struct RoomLobbyView: View {
     @State private var goToGame: Bool = false
     @State private var activeGame: Game?
     
+    let TARGET_SCORE = 200
+    
     private var isHost: Bool {
         viewModel.room?.hostId == localPlayerId
     }
@@ -49,7 +51,7 @@ struct RoomLobbyView: View {
                 if isHost {
                     Button("Start Game") {
                         Task {
-                            if let game = await viewModel.startGame(targetScore: 500) {
+                            if let game = await viewModel.startGame(targetScore: TARGET_SCORE) {
                                 activeGame = game
                                 goToGame = true
                             }

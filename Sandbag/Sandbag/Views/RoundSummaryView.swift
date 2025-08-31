@@ -9,6 +9,8 @@ import SwiftUI
 
 struct RoundSummaryView: View {
     @ObservedObject var vm: GameViewModel
+    let playerId: String
+    
     var body: some View {
         VStack {
             Text("Round Summary")
@@ -32,9 +34,14 @@ struct RoundSummaryView: View {
             }
             
             Button("Continue to Next Round") {
-                // trigger new Round creation (TODO in repo/vm)
+                Task { await vm.startNextRound() }
             }
             .padding(.top, 20)
+            
+            Button("Quit Game", role: .destructive) {
+                Task { await vm.forfeitGame(playerId: playerId) }
+            }
+            .padding(.top, 12)
         }
         .padding()
     }
