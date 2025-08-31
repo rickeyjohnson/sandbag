@@ -132,14 +132,18 @@ final class FirestoreGameRepository: GameRepository {
         let ref = db.collection("games").document(gameId)
         var game = try await ref.getDocument(as: Game.self)
         
-        guard var round = game.currentRound else { throw NSError(domain: "No current round", code: 400)}
+        guard var round = game.currentRound else { throw NSError(domain: "No current round", code: 400) }
         round.bids[playerId] = bid
         
         if round.bids.count == game.players.count {
             round.phase = .teamConfirmation
         }
         
-        try ref.setData(from: game, merge: true)
+        if let idx = game.rounds.indices.last {
+           game.rounds[idx] = round
+       }
+        
+        try ref.setData(from: game, merge: false)
     }
     
     func confirmTeamBid(gameId: String, teamId: String, bid: Int, confirmedBy: String) async throws {
@@ -153,7 +157,11 @@ final class FirestoreGameRepository: GameRepository {
             round.phase = .playing
         }
         
-        try ref.setData(from: game, merge: true)
+        if let idx = game.rounds.indices.last {
+            game.rounds[idx] = round
+        }
+        
+        try ref.setData(from: game, merge: false)
     }
     
     func submitBooks(gameId: String, playerId: String, books: Int) async throws {
@@ -162,6 +170,10 @@ final class FirestoreGameRepository: GameRepository {
         
         guard var round = game.currentRound else { throw NSError(domain: "No active round", code: 400) }
         round.booksWon[playerId] = books
+        
+        if let idx = game.rounds.indices.last {
+            game.rounds[idx] = round
+        }
         
         if round.booksWon.count == game.players.count {
             round.phase = .scoring
@@ -186,7 +198,10 @@ final class FirestoreGameRepository: GameRepository {
         let (updatedRound, updateGame) = calculateRoundScore(game: game, round: round)
         
         var gameCopy = updateGame
-        gameCopy.rounds.append(updatedRound)
+        
+        if let idx = gameCopy.rounds.indices.last {
+            gameCopy.rounds[idx] = updatedRound
+        }
         
         try ref.setData(from: gameCopy, merge: true)
         return gameCopy
