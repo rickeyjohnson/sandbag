@@ -31,11 +31,13 @@ struct BiddingView: View {
                 }
             }
             .padding(.top, 12)
+            .disabled(Int(bid) == nil || Int(bid)! < 0 || Int(bid)! > 13)
             
-            if let bids = vm.game?.currentRound?.bids {
+            if let game = vm.game, let bids = game.currentRound?.bids {
                 List {
                     ForEach(bids.keys.sorted(), id: \.self) { id in
-                        Text("\(id): \(bids[id] ?? 0)")
+                        let name = game.playerName(for: id)
+                        Text("\(name): \(bids[id] ?? 0)")
                     }
                 }
             }

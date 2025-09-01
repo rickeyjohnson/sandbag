@@ -12,8 +12,7 @@ struct RoomLobbyView: View {
     let localPlayerId: String
     @State private var goToGame: Bool = false
     @State private var activeGame: Game?
-    
-    let TARGET_SCORE = 200
+    @State private var targetScore = "500"
     
     private var isHost: Bool {
         viewModel.room?.hostId == localPlayerId
@@ -49,16 +48,27 @@ struct RoomLobbyView: View {
                 }
                 
                 if isHost {
+                    Text("Set Target Score")
+                        .font(.headline)
+
+                    TextField("Target Score", text: $targetScore)
+                        .keyboardType(.numberPad)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .frame(width: 120)
+                        .multilineTextAlignment(.center)
+                    
                     Button("Start Game") {
-                        Task {
-                            if let game = await viewModel.startGame(targetScore: TARGET_SCORE) {
-                                activeGame = game
-                                goToGame = true
+                        if let score = Int(targetScore), score > 0 {
+                            Task {
+                                if let game = await viewModel.startGame(targetScore: score) {
+                                    activeGame = game
+                                    goToGame = true
+                                }
                             }
                         }
                     }
                     .buttonStyle(.borderedProminent)
-                    .disabled(!viewModel.canStartGame)
+                    .disabled(!viewModel.canStartGame || Int(targetScore) == nil)
                 }
                 
                 Button("Leave Room", role: .destructive) {
@@ -66,11 +76,12 @@ struct RoomLobbyView: View {
                 }
                 .padding(.top, 8)
                 
+                // Navigation to GameView
                 NavigationLink("", isActive: $goToGame) {
                     if let game = activeGame {
                         let gameRepo = FirestoreGameRepository()
                         let gvm = GameViewModel(repository: gameRepo)
-                        GameView(vm: gvm, playerId: localPlayerId )
+                        GameView(vm: gvm, playerId: localPlayerId, isHost: isHost)
                             .onAppear {
                                 gvm.game = game
                                 gvm.listen(to: game.id)
@@ -87,10 +98,11 @@ struct RoomLobbyView: View {
         .padding()
         .navigationTitle("Room Lobby")
         .onChange(of: viewModel.activeGame) { _, newGame in
-                    if let newGame {
-                        activeGame = newGame
-                        goToGame = true
-                    }
-                }
+            // Non-host players move to game automatically
+            if let newGame {
+                activeGame = newGame
+                goToGame = true
+            }
+        }
     }
 }

@@ -72,12 +72,12 @@ final class FirestoreRoomRepository: RoomRepository {
     func leaveRoom(roomId: String, playerId: String) async throws {
         let ref = db.collection("rooms").document(roomId)
         var room = try await ref.getDocument(as: Room.self)
-        room.players.removeAll { $0.id == playerId }
-
-        if room.players.isEmpty {
-            try await ref.delete()
+        
+        if room.hostId == playerId {
+            try? await ref.delete()
         } else {
-            try ref.setData(from: room)
+            room.players.removeAll { $0.id == playerId }
+            try? ref.setData(from: room, merge: true)
         }
     }
 
@@ -130,6 +130,12 @@ final class FirestoreRoomRepository: RoomRepository {
         // Validate teams
         let red = room.players.filter { $0.team == .red }
         let blue = room.players.filter { $0.team == .blue }
+        let unnassigned = room.players.filter { $0.team == nil }
+        
+        guard unnassigned.isEmpty else {
+            throw NSError(domain: "All players must join a team", code: 400)
+        }
+        
         guard red.count == blue.count else {
             throw NSError(domain: "Teams not ready", code: 400)
         }
@@ -148,7 +154,8 @@ final class FirestoreRoomRepository: RoomRepository {
             booksWon: [:],
             roundScore: [:],
             createdAt: Date(),
-            phase: .bidding
+            phase: .bidding,
+            teamConfirmers: [:]
         )
 
         // Create game

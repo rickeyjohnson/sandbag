@@ -113,7 +113,8 @@ final class FirestoreGameRepository: GameRepository {
             booksWon: [:],
             roundScore: [:],
             createdAt: Date(),
-            phase: .bidding
+            phase: .bidding,
+            teamConfirmers: [:]
         )
 
         game.rounds.append(newRound)
@@ -152,7 +153,8 @@ final class FirestoreGameRepository: GameRepository {
                     booksWon: [:],
                     roundScore: [:],
                     createdAt: Date(),
-                    phase: .bidding
+                    phase: .bidding,
+                    teamConfirmers: [:]
                 )
 
         let redCount = game.players.filter { $0.team == .red }.count
@@ -205,6 +207,15 @@ final class FirestoreGameRepository: GameRepository {
         
         if round.bids.count == game.players.count {
             round.phase = .teamConfirmation
+            
+            for team in game.teams {
+                if round.teamConfirmers[team.id] == nil {
+                    let teamPlayers = game.players.filter { $0.team?.rawValue == team.id }
+                    if let chosen = teamPlayers.randomElement() {
+                        round.teamConfirmers[team.id] = chosen.id
+                    }
+                }
+            }
         }
         
         if let idx = game.rounds.indices.last {
@@ -219,6 +230,11 @@ final class FirestoreGameRepository: GameRepository {
         var game = try await ref.getDocument(as: Game.self)
         
         guard var round = game.currentRound else { throw NSError(domain: "No active round", code: 400) }
+        
+        guard round.teamConfirmers[teamId] == confirmedBy else {
+            throw NSError(domain: "Not authorized to confirm for this team", code: 403)
+        }
+        
         round.teamBids[teamId] = bid
         
         if round.teamBids.count == game.teams.count {
@@ -261,20 +277,32 @@ final class FirestoreGameRepository: GameRepository {
     
     func scoreRound(gameId: String, round: Round) async throws -> Game {
         let ref = db.collection("games").document(gameId)
-        var game = try await ref.getDocument(as: Game.self)
+        let game = try await ref.getDocument(as: Game.self)
         
         let (updatedRound, updatedGame) = calculateRoundScore(game: game, round: round)
         var gameCopy = updatedGame
         
-        for (teamId, total) in gameCopy.teamTotals {
-            if total >= gameCopy.targetScore {
-                gameCopy.isActive = false
-                gameCopy.winnerTeamId = teamId
-            }
-        }
-        
         if let idx = gameCopy.rounds.indices.last {
             gameCopy.rounds[idx] = updatedRound
+        }
+        
+        let winningTeams = gameCopy.teamTotals.filter { $0.value >= gameCopy.targetScore }.map { $0.key }
+        
+        if winningTeams.count == 1 {
+            gameCopy.isActive = false
+            gameCopy.winnerTeamId = winningTeams.first
+        } else if winningTeams.count == 2 {
+            let tieBreakerRound = Round(
+                id: UUID().uuidString,
+                bids: [:],
+                teamBids: [:],
+                booksWon: [:],
+                roundScore: [:],
+                createdAt: Date(),
+                phase: .bidding,
+                teamConfirmers: [:]
+            )
+            gameCopy.rounds.append(tieBreakerRound)
         }
         
         try ref.setData(from: gameCopy, merge: true)

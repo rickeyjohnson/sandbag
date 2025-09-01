@@ -23,4 +23,5 @@ struct Round: Identifiable, Codable, Equatable {
     var roundScore: [String: Int] // teamID: score
     var createdAt: Date
     var phase: RoundPhase
+    var teamConfirmers: [String: String]
 }

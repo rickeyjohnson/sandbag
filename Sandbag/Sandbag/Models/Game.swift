@@ -49,3 +49,9 @@ struct Game: Identifiable, Codable, Equatable {
         self.playerTotals = playerTotals
     }
 }
+
+extension Game {
+    func playerName(for id: String) -> String {
+        players.first(where: { $0.id == id })?.name ?? id
+    }
+}

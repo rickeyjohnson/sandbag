@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+import SwiftUI
+
 struct HomeView: View {
     @StateObject private var viewModel: RoomViewModel
     @State private var joinCode: String = ""
@@ -57,16 +59,17 @@ struct HomeView: View {
                     Text(err).foregroundStyle(.red)
                 }
                 
+                // Navigation to Lobby
                 NavigationLink("", isActive: $goToLobby) {
-                    RoomLobbyView(viewModel: viewModel, localPlayerId: viewModel.localPlayerId ?? "")
+                    if let localId = viewModel.localPlayerId {
+                        RoomLobbyView(viewModel: viewModel, localPlayerId: localId)
+                    } else {
+                        Text("Error loading room…")
+                    }
                 }
                 .hidden()
             }
             .padding()
         }
     }
-}
-
-#Preview {
-    HomeView()
 }

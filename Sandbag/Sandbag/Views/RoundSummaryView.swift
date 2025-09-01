@@ -10,6 +10,7 @@ import SwiftUI
 struct RoundSummaryView: View {
     @ObservedObject var vm: GameViewModel
     let playerId: String
+    let isHost: Bool
     
     var body: some View {
         VStack {
@@ -33,10 +34,12 @@ struct RoundSummaryView: View {
                 }
             }
             
-            Button("Continue to Next Round") {
-                Task { await vm.startNextRound() }
+            if isHost {
+                Button("Continue to Next Round") {
+                    Task { await vm.startNextRound() }
+                }
+                .padding(.top, 20)
             }
-            .padding(.top, 20)
             
             Button("Quit Game", role: .destructive) {
                 Task { await vm.forfeitGame(playerId: playerId) }

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct WinnerView: View {
     let game: Game
+    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         VStack(spacing: 20) {
@@ -17,21 +18,22 @@ struct WinnerView: View {
                     .font(.largeTitle.bold())
                     .foregroundColor(winner == "red" ? .red : .blue)
             } else {
-                Text("Game Over")
-                    .font(.largeTitle.bold())
+                Text("Game Over").font(.largeTitle.bold())
             }
-            
+
             VStack(alignment: .leading, spacing: 8) {
-                Text("Final Scores:")
-                    .font(.title2.bold())
+                Text("Final Scores:").font(.title2.bold())
                 ForEach(game.teamTotals.keys.sorted(), id: \.self) { teamId in
                     Text("\(teamId.capitalized) Team: \(game.teamTotals[teamId] ?? 0)")
                 }
             }
-            
-            NavigationLink("Back to Home", destination: HomeView())
-                .buttonStyle(.borderedProminent)
-                .padding(.top, 20)
+
+            Button("Back to Home") {
+                // Pop all navigation links
+                dismiss()
+            }
+            .buttonStyle(.borderedProminent)
+            .padding(.top, 20)
         }
         .padding()
     }

@@ -13,6 +13,8 @@ struct ScoringView: View {
     @State private var books = ""
     
     var body: some View {
+        let alreadySubmitted = vm.game?.currentRound?.booksWon[playerId] != nil
+
         VStack {
             Text("Enter books won")
                 .font(.headline)
@@ -24,12 +26,20 @@ struct ScoringView: View {
                 .cornerRadius(8)
                 .frame(width: 100)
             
-            Button("Submit Books") {
+            Button(alreadySubmitted ? "Waiting for others..." : "Submit Books") {
                 if let booksValue = Int(books) {
                     Task { await vm.submitBooks(playerId: playerId, books: booksValue) }
                 }
             }
             .padding(.top, 12)
+            .buttonStyle(.borderedProminent)
+            .disabled(alreadySubmitted)
+            
+            if let round = vm.game?.currentRound {
+                Text("\(round.booksWon.count)/\(vm.game?.players.count ?? 0) players submitted")
+                    .font(.footnote)
+                    .foregroundColor(.secondary)
+            }
         }
         .padding()
     }
