@@ -8,27 +8,26 @@
 import Foundation
 import SwiftUI
 
-struct SandbagDesign {
-    // Colors
-    static let primaryBlue = Color.blue
-    static let primaryRed = Color.red
-    static let cardBackground = Color(.systemBackground)
-    static let secondaryBackground = Color(.secondarySystemBackground)
-    static let tertiaryBackground = Color(.tertiarySystemBackground)
+struct AppleDesign {
+    // Colors - Using system colors for true iOS feel
+    static let background = Color(.systemBackground)
+    static let groupedBackground = Color(.systemGroupedBackground)
+    static let secondaryGroupedBackground = Color(.secondarySystemGroupedBackground)
     static let accent = Color.accentColor
+    static let label = Color(.label)
+    static let secondaryLabel = Color(.secondaryLabel)
+    static let separator = Color(.separator)
     
-    // Spacing
-    static let paddingXS: CGFloat = 4
-    static let paddingS: CGFloat = 8
-    static let paddingM: CGFloat = 16
-    static let paddingL: CGFloat = 24
-    static let paddingXL: CGFloat = 32
+    // Spacing - Apple's standard spacing
+    static let spacing4: CGFloat = 4
+    static let spacing8: CGFloat = 8
+    static let spacing12: CGFloat = 12
+    static let spacing16: CGFloat = 16
+    static let spacing20: CGFloat = 20
+    static let spacing24: CGFloat = 24
+    static let spacing32: CGFloat = 32
     
     // Corner Radius
-    static let cornerRadiusS: CGFloat = 8
-    static let cornerRadiusM: CGFloat = 12
-    static let cornerRadiusL: CGFloat = 16
-    
-    // Shadows
-    static let cardShadow = Color.black.opacity(0.1)
+    static let cornerRadius: CGFloat = 10
+    static let buttonRadius: CGFloat = 8
 }

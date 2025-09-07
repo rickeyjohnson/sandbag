@@ -13,21 +13,48 @@ struct PlayingView: View {
     let isHost: Bool
     
     var body: some View {
-        VStack {
-            Text("Game in progress…")
-                .font(.headline)
-
+        VStack(spacing: AppleDesign.spacing32) {
+            Spacer()
+            
+            Image(systemName: "gamecontroller.fill")
+                .font(.system(size: 60))
+                .foregroundColor(AppleDesign.accent)
+            
+            VStack(spacing: AppleDesign.spacing12) {
+                Text("Game in Progress")
+                    .font(.system(.largeTitle, weight: .bold))
+                    .foregroundColor(AppleDesign.label)
+                
+                Text("Play your cards strategically!")
+                    .font(.system(.body))
+                    .foregroundColor(AppleDesign.secondaryLabel)
+                    .multilineTextAlignment(.center)
+            }
+            
+            Spacer()
+            
             if isHost {
                 Button("Finish Round") {
                     Task { await vm.finishRound() }
                 }
-                .padding(.top, 12)
+                .buttonStyle(ApplePrimaryButtonStyle())
             } else {
-                Text("Waiting for host to finish the round…")
-                .foregroundColor(.secondary)
-                .padding(.top, 12)
+                VStack(spacing: AppleDesign.spacing8) {
+                    Image(systemName: "clock.fill")
+                        .font(.system(.title2))
+                        .foregroundColor(.orange)
+                    
+                    Text("Waiting for host to finish the round...")
+                        .font(.system(.body))
+                        .foregroundColor(AppleDesign.secondaryLabel)
+                        .multilineTextAlignment(.center)
+                }
             }
+            
+            Spacer()
         }
-        .padding()
+        .padding(.horizontal)
+        .navigationTitle("Playing")
+        .navigationBarTitleDisplayMode(.large)
     }
 }

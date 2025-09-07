@@ -12,29 +12,24 @@ struct WinnerView: View {
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: AppleDesign.spacing32) {
+            Image(systemName: "crown.fill")
+                .font(.system(size: 80))
+                .foregroundColor(.yellow)
+            
             if let winner = game.winnerTeamId {
                 Text("\(winner.capitalized) Team Wins!")
-                    .font(.largeTitle.bold())
+                    .font(.system(.largeTitle, weight: .bold))
                     .foregroundColor(winner == "red" ? .red : .blue)
-            } else {
-                Text("Game Over").font(.largeTitle.bold())
             }
-
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Final Scores:").font(.title2.bold())
-                ForEach(game.teamTotals.keys.sorted(), id: \.self) { teamId in
-                    Text("\(teamId.capitalized) Team: \(game.teamTotals[teamId] ?? 0)")
-                }
-            }
-
+            
             Button("Back to Home") {
-                // Pop all navigation links
                 dismiss()
             }
-            .buttonStyle(.borderedProminent)
-            .padding(.top, 20)
+            .buttonStyle(ApplePrimaryButtonStyle())
         }
-        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(.horizontal, AppleDesign.spacing20)
+        .background(AppleDesign.groupedBackground)
     }
 }

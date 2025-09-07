@@ -10,15 +10,6 @@ import Combine
 
 @MainActor
 class RoomViewModel: ObservableObject {
-    // create a room with a unique 6-character code
-    // join a room by code (cap at 4 players)
-    // expose the current room + players to the UI (@Published)
-    // Allow partner selection (pair two players)
-    // Keep a live subscription to room changes (realtime updates)
-    // Handle leaving room / cleaning up listeners
-    // Surface loading & errors for the UI
-    let TARGET_SCORE = 200
-    
     // MARK: - Published UI State
     @Published var room: Room?
     @Published var errorMessage: String?
@@ -35,7 +26,7 @@ class RoomViewModel: ObservableObject {
         guard let room = room else { return false }
         
         // Require exactly 4 players
-        guard room.players.count >= 2 else { return false } // was 4 REVERT when deploying
+        guard room.players.count >= PLAYER_COUNT else { return false } // was 4 REVERT when deploying
         
         // Require that all players have a team assignment
         let allAssigned = room.players.allSatisfy { $0.team != nil }
